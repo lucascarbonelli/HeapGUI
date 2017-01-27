@@ -5,8 +5,50 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Heap"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="HeapGUI" Height="500" Width="300">
+    
+    <Window.CommandBindings>
+        <CommandBinding Command="local:CustomCommands.Insertar" Executed="ComandoInsertar_Executed" CanExecute="ComandoInsertar_CanExecute" />
+        <CommandBinding Command="local:CustomCommands.Eliminar" Executed="ComandoEliminar_Executed" CanExecute="ComandoEliminar_CanExecute" />
+        <CommandBinding Command="local:CustomCommands.Desencolar" Executed="ComandoDesencolar_Executed" CanExecute="ComandoDesencolar_CanExecute" />
+    </Window.CommandBindings>
+
+    <!--<Window.InputBindings>
+        <KeyBinding Command="{Binding Path=local:CustomCommands.Eliminar}" Key="O" Modifiers="Ctrl"/>
+    </Window.InputBindings>-->
+    
+    <Window.Resources>
+        <local:isStringNumber x:Key="isStringNumber" />
+    </Window.Resources>
+
     <Grid>
-        
+        <StackPanel>
+            <Button Name="buttonDesencolar" Command="local:CustomCommands.Desencolar" Content="Desencolar"
+                    HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" Width="170"/>
+            <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="23" Margin="10" TextWrapping="Wrap" 
+                         VerticalAlignment="Top" Width="170" MaxLength="12" KeyDown="OnKeyDownHandler"/>
+
+            <StackPanel Orientation="Horizontal">
+                <Button Name="button" Command="local:CustomCommands.Insertar" Content="Insertar" 
+                        IsEnabled="{Binding ElementName=textBox, Path=Text, Converter={StaticResource isStringNumber}}" 
+                        HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" Width="75"/>
+                <Button Name="buttonEliminar" Command="local:CustomCommands.Eliminar" Content="Eliminar" 
+                        IsEnabled="{Binding ElementName=textBox, Path=Text, Converter={StaticResource isStringNumber}}" 
+                        HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" Width="75"/>
+            </StackPanel>
+            
+            <ListView Name="elementos" HorizontalAlignment="Left" Height="300" VerticalAlignment="Top" Width="270" Margin="5" SelectionChanged="listView_SelectionChanged">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="#" Width="25" DisplayMemberBinding="{Binding Id}"/>
+                        <GridViewColumn Header="Valor" Width="90" DisplayMemberBinding="{Binding Valor}"/>
+                        <GridViewColumn Header="Acción" Width="70" DisplayMemberBinding="{Binding Accion}"/>
+                        <GridViewColumn Header="En heap" Width="50" DisplayMemberBinding="{Binding EnHeap}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            
+        </StackPanel>
+
     </Grid>
 </Window>
