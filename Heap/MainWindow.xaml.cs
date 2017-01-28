@@ -16,6 +16,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using HeapManagedDllWrapper;
+
 namespace Heap
 {
     /// <summary>
@@ -23,6 +25,7 @@ namespace Heap
     /// </summary>
     public partial class MainWindow : Window
     {
+        HeapModificableWrapper heap = new HeapModificableWrapper();
         private ObservableCollection<Elemento> elementosLista = new ObservableCollection<Elemento>();
 
         public MainWindow()
@@ -106,7 +109,11 @@ namespace Heap
 
         private void Insertar_Executed()
         {
-            elementosLista.Add(new Elemento(elementosLista.Count() + 1, int.Parse(textBox.Text), Acciones.Insertar));
+            int valor = int.Parse(textBox.Text);
+            //HeapModificableWrapper.IteradorWrapper it = heap.encolarWrapper(valor);
+            //elementosLista.Add(new Elemento(elementosLista.Count() + 1, valor, Acciones.Insertar, it));
+            elementosLista.Add(new Elemento(elementosLista.Count() + 1, valor, Acciones.Insertar));
+            heap.encolarWrapper(valor, elementosLista.Last().iter);
         }
 
         private bool Eliminar_CanExecute()
@@ -135,10 +142,12 @@ namespace Heap
                 if (elem.Valor == i && elem.EnHeap == EstaEnHeap.Si)
                 {
                     elem.EnHeap = EstaEnHeap.No;
+                    elem.iter.eliminarSiguienteWrapper();
+                    elem.iter = null;
                 }
             }
 
-            elementosLista.Add(new Elemento(elementosLista.Count() + 1, i, Acciones.Eliminar));
+            elementosLista.Add(new Elemento(elementosLista.Count() + 1, i, Acciones.Eliminar, null));
         }
 
         private bool Desencolar_CanExecute()
@@ -155,12 +164,14 @@ namespace Heap
     
         private void Desencolar_Execute()
         {
+            int valor = heap.proximoWrapper();
+            heap.desencolarWrapper();
             foreach (Elemento elem in elementosLista)
             {
-                if (elem.EnHeap == EstaEnHeap.Si)
+                if (elem.Valor == valor && elem.EnHeap == EstaEnHeap.Si)
                 {
                     elem.EnHeap = EstaEnHeap.No;
-                    elementosLista.Add(new Elemento(elementosLista.Count() + 1, elem.Valor, Acciones.Desencolar));
+                    elementosLista.Add(new Elemento(elementosLista.Count() + 1, elem.Valor, Acciones.Desencolar, null));
                     break;
                 }
             }
@@ -176,6 +187,9 @@ namespace Heap
     public class Elemento : INotifyPropertyChanged
     {
         private EstaEnHeap enHeap;
+        private int v;
+        private Acciones insertar;
+
         public int Id { get; set; }
         public int Valor { get; set; }
         public Acciones Accion { get; set; }
@@ -190,14 +204,33 @@ namespace Heap
                 }
             }
         }
+        public HeapModificableWrapper.IteradorWrapper iter { get; set; }
+
+        public Elemento(int id, int val, Acciones accion, HeapModificableWrapper.IteradorWrapper it)
+        {
+            Id = id;
+            Valor = val;
+            Accion = accion;
+            iter = it;
+
+            if(accion == Acciones.Insertar)
+            {
+                EnHeap = EstaEnHeap.Si;
+            }
+            else
+            {
+                EnHeap = EstaEnHeap.No;
+            }
+        }
 
         public Elemento(int id, int val, Acciones accion)
         {
             Id = id;
             Valor = val;
             Accion = accion;
+            iter = new HeapModificableWrapper.IteradorWrapper();
 
-            if(accion == Acciones.Insertar)
+            if (accion == Acciones.Insertar)
             {
                 EnHeap = EstaEnHeap.Si;
             }
