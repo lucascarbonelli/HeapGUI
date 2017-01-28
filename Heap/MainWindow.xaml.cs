@@ -54,7 +54,8 @@ namespace Heap
 
         private void ComandoEliminar_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = Eliminar_CanExecute();
+            e.CanExecute = false;
+            //e.CanExecute = Eliminar_CanExecute();
         }
 
         private void ComandoEliminar_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -78,7 +79,7 @@ namespace Heap
             {
                 if (Eliminar_CanExecute())
                 {
-                    Eliminar_Executed();
+                    //Eliminar_Executed();
                 }
                 else if (Insertar_CanExecute())
                 {
